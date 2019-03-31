@@ -129,6 +129,7 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 		ch <- satMetric(&light)
 		ch <- brightMetric(&light)
 		ch <- reachMetric(&light)
+		ch <- hueMetric(&light)
 	}
 }
 
