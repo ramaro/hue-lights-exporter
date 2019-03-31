@@ -53,7 +53,7 @@ $ curl -X POST -d '{"devicetype":"my app name#my_username"}' http://philips-hue/
 [{"error":{"type":101,"address":"","description":"link button not pressed"}}]
 ```
 
-Then press huge bridge link button and run curl again:
+Then press hue bridge link button and run curl again:
 ```
 $ curl -X POST -d '{"devicetype":"my app name#my_username"}' http://philips-hue/api
 [{"success":{"username":"VBYPKZXBqwcLCSdzj5yLW1gjK2fb9XCOSxQ1dP7B"}}]
