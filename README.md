@@ -36,10 +36,14 @@ $ hue-lights-exporter -username VBYPKZXBqwcLCSdzj5yLW1gjK2fb9XCOSxQ1dP7B
 
 ### Metrics
 
-|Name           |Type   |Help
-|----           |----   |----
-| light_status  | gauge | Status of light (on/off, name, hue, saturation, brightness, id, reachable)
-| up            | gauge | Was the last scrape successful?
+|Name               |Type   |Help
+|----               |----   |----
+| light_status      | gauge | Status of light (on/off) [name, id, unique_id]
+| light_brightness  | gauge | Brightness of light [name, id, unique_id]
+| light_hue         | gauge | Hue of light [name, id, unique_id]
+| light_saturation  | gauge | Saturation of light [name, id, unique_id]
+| light_reachable   | gauge | Reachability of light [name, id, unique_id]
+| up                | gauge | Was the last scrape successful?
 
 ## Creating an authorised Hue Bridge API username (example)
 

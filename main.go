@@ -18,6 +18,10 @@ var (
 	metricsPath string
 	upDesc      prometheus.Desc
 	statusDesc  prometheus.Desc
+	satDesc     prometheus.Desc
+	brightDesc  prometheus.Desc
+	hueDesc     prometheus.Desc
+	reachDesc   prometheus.Desc
 )
 
 type Exporter struct {
@@ -27,28 +31,76 @@ type Exporter struct {
 func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	ch <- &upDesc
 	ch <- &statusDesc
+	ch <- &satDesc
+	ch <- &brightDesc
+	ch <- &hueDesc
+	ch <- &reachDesc
 }
 
-func stateMetric(light *huego.Light) prometheus.Metric {
+func statusMetric(light *huego.Light) prometheus.Metric {
 	lightID := fmt.Sprint(light.ID)
 	lightOn := float64(0)
 	if light.State.On {
 		lightOn = 1
 	}
-	lightReachable := "0"
-	if light.State.Reachable {
-		lightReachable = "1"
-	}
-	lightBrightness := fmt.Sprint(light.State.Bri)
-	lightHue := fmt.Sprint(light.State.Hue)
-	lightSaturation := fmt.Sprint(light.State.Sat)
 
 	return prometheus.MustNewConstMetric(
 		&statusDesc,
 		prometheus.GaugeValue,
 		lightOn,
-		light.Name, lightID, light.UniqueID, lightReachable, lightBrightness, lightHue,
-		lightSaturation,
+		light.Name, lightID, light.UniqueID,
+	)
+
+}
+
+func brightMetric(light *huego.Light) prometheus.Metric {
+	lightID := fmt.Sprint(light.ID)
+
+	return prometheus.MustNewConstMetric(
+		&brightDesc,
+		prometheus.GaugeValue,
+		float64(light.State.Bri),
+		light.Name, lightID, light.UniqueID,
+	)
+
+}
+
+func hueMetric(light *huego.Light) prometheus.Metric {
+	lightID := fmt.Sprint(light.ID)
+
+	return prometheus.MustNewConstMetric(
+		&hueDesc,
+		prometheus.GaugeValue,
+		float64(light.State.Hue),
+		light.Name, lightID, light.UniqueID,
+	)
+
+}
+
+func satMetric(light *huego.Light) prometheus.Metric {
+	lightID := fmt.Sprint(light.ID)
+
+	return prometheus.MustNewConstMetric(
+		&satDesc,
+		prometheus.GaugeValue,
+		float64(light.State.Sat),
+		light.Name, lightID, light.UniqueID,
+	)
+
+}
+
+func reachMetric(light *huego.Light) prometheus.Metric {
+	lightID := fmt.Sprint(light.ID)
+	lightReachable := float64(0)
+	if light.State.Reachable {
+		lightReachable = 1
+	}
+
+	return prometheus.MustNewConstMetric(
+		&reachDesc,
+		prometheus.GaugeValue,
+		lightReachable,
+		light.Name, lightID, light.UniqueID,
 	)
 
 }
@@ -73,7 +125,10 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	ch <- upMetric(1)
 
 	for _, light := range lights {
-		ch <- stateMetric(&light)
+		ch <- statusMetric(&light)
+		ch <- satMetric(&light)
+		ch <- brightMetric(&light)
+		ch <- reachMetric(&light)
 	}
 }
 
@@ -115,8 +170,20 @@ func init() {
 
 	// Desc
 	upDesc = *prometheus.NewDesc("up", "Was the last query successful?", []string{}, prometheus.Labels{})
-	statusDesc = *prometheus.NewDesc("light_status", "State of light (on/off)",
-		[]string{"name", "id", "unique_id", "reachable", "brightness", "hue", "saturation"},
+	statusDesc = *prometheus.NewDesc("light_status", "Status of light (on/off)",
+		[]string{"name", "id", "unique_id"},
+		prometheus.Labels{})
+	brightDesc = *prometheus.NewDesc("light_brightness", "Brightness of light",
+		[]string{"name", "id", "unique_id"},
+		prometheus.Labels{})
+	hueDesc = *prometheus.NewDesc("light_hue", "Hue of light",
+		[]string{"name", "id", "unique_id"},
+		prometheus.Labels{})
+	satDesc = *prometheus.NewDesc("light_saturation", "Saturation of light",
+		[]string{"name", "id", "unique_id"},
+		prometheus.Labels{})
+	reachDesc = *prometheus.NewDesc("light_reachable", "Reachability of light",
+		[]string{"name", "id", "unique_id"},
 		prometheus.Labels{})
 }
 
