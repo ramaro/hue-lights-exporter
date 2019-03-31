@@ -34,6 +34,13 @@ Usage of ./hue-lights-exporter:
 $ hue-lights-exporter -username VBYPKZXBqwcLCSdzj5yLW1gjK2fb9XCOSxQ1dP7B
 ```
 
+### Metrics
+
+|Name           |Type   |Help
+|----           |----   |----
+| light_status  | gauge | Status of light (on/off, name, hue, saturation, brightness, id, reachable)
+| up            | gauge | Was the last scrape successful?
+
 ## Creating an authorised Hue Bridge API username (example)
 
 Register with curl command:
